@@ -23,14 +23,22 @@ export default class Role {
     /**
      * Check if user is logged-in or not.
      */
-    let user = await auth.user
+    let user = await auth.use('jwt').user
+
     if (!user) {
       return response.unauthorized({ error: 'Must be logged in' })
     }
-    let hasRole = await this.checkHasRoles(auth.user, roleNames)
+
+    /**
+     * Check if user has any of the specified roles
+     * If not, return 401
+     */
+    let hasRole = await this.checkHasRoles(user, roleNames)
+    // console.log(user, hasRole)
+
     if (!hasRole) {
       return response.unauthorized({
-        error: `Doesn't have required role(s): ${roleNames.join(',')}`,
+          error: 'You are not authorized to access this resource',
       })
     }
     await next()

@@ -1,4 +1,5 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
+import User from 'App/Models/User';
 
 export default class AuthController {
 
@@ -10,19 +11,29 @@ export default class AuthController {
 
   public async login({ request, auth, response }: HttpContextContract) {
 
-    const username = request.input('username');
-    const email = request.input('email');
+    const usernameORemail = request.input('username') || request.input('email');
     const password = request.input('password');
 
+    if (!usernameORemail || !password) {
+      return response.badRequest('Missing username/email or password field');
+    }
+
     try {
-      const token = await auth.use('jwt').attempt(username || email, password, {
-        expiresIn: '10 days'
+
+      const user = await User.findBy('username', usernameORemail) || await User.findBy('email', usernameORemail);
+
+      if (!user) {
+        return response.badRequest('Invalid username/email or password');
+      }
+
+      const token = await auth.use('jwt').generate(user, {
+        expiresIn: '10day',
       });
 
       return token.toJSON();
     } catch (error) {
       console.log(error);
-      return response.badRequest('Invalid credentials');
+      return response.internalServerError('Failed to login');
     }
 
   }

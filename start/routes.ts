@@ -36,6 +36,13 @@ Route.group(() => {
     Route.post('/logout', 'AuthController.logout')
 
     // Users
-  }).middleware('auth')
+    Route.get('/users', 'UsersController.index').middleware('role:superadmin')
+    Route.post('/users', 'UsersController.store').middleware('permission:can-create-user')
+    Route.get('/users/:id', 'UsersController.show').middleware('permission:can-see-user')
+    Route.patch('/users/:id', 'UsersController.update').middleware('permission:can-edit-user')
+    Route.delete('/users/:id', 'UsersController.destroy').middleware('permission:can-delete-user')
+
+    // Roles
+  }).middleware('auth:jwt')
 
 }).prefix('/api/v1')
