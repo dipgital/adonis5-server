@@ -3,6 +3,7 @@ import {column, BaseModel, SnakeCaseNamingStrategy, manyToMany, ManyToMany} from
 import { DateTime } from 'luxon'
 import moment from 'moment'
 import Permission from 'App/Models/Permission'
+import User from './User'
 
 export default class Role extends BaseModel {
   public static namingStrategy = new SnakeCaseNamingStrategy()
@@ -72,4 +73,10 @@ export default class Role extends BaseModel {
     pivotTable: 'role_permissions',
   })
   public permissions: ManyToMany<typeof Permission>
+
+  @manyToMany(() => User, {
+    pivotTable: 'user_roles',  // nama tabel pivot/junction sesuai dengan konfigurasi Anda
+  })
+  public users: ManyToMany<typeof User>
+
 }

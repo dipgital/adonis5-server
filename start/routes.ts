@@ -36,7 +36,7 @@ Route.group(() => {
     Route.post('/logout', 'AuthController.logout')
 
     // Users
-    Route.get('/users', 'UsersController.index').middleware('role:superadmin')
+    Route.get('/users', 'UsersController.index').middleware('permission:can-see-user')
     Route.post('/users', 'UsersController.store').middleware('permission:can-create-user')
     Route.get('/users/:id', 'UsersController.show').middleware('permission:can-see-user')
     Route.patch('/users/:id', 'UsersController.update').middleware('permission:can-edit-user')
