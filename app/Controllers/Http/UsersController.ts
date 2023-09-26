@@ -11,8 +11,14 @@ export default class UsersController {
 
   public async index({  }: HttpContextContract) {
     // get all users
-    const users = await User.query().preload('roles')
+    const users = await User
+      .query()
+      .select(['id', 'username', 'email'])
+      .preload('roles', (query) => {
+        query.select(['id', 'name'])
+      })
 
+    // return json
     return users
 
   }
@@ -52,14 +58,20 @@ export default class UsersController {
 
   public async show({ response, params }: HttpContextContract) {
 
-    const user = await User.findOrFail(params.id)
+    const user = await User
+      .query()
+      .where('id', params.id)
+      .select(['id', 'username', 'email'])
+      .preload('roles', (query) => {
+        query.select(['id', 'name'])
+      })
+      .firstOrFail()
+
     if (!user) {
-
-      return response.notFound({ error: 'User not found.' })
-
+      return response.notFound(
+        { error: 'User not found.' }
+      )
     }
-
-    await user.load('roles')
 
     return user
   }

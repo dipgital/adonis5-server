@@ -26,7 +26,12 @@ export default class AuthController {
         return response.badRequest('Invalid username/email or password');
       }
 
-      const token = await auth.use('jwt').generate(user, {
+      const token = await auth.use('jwt').login(user, {
+        payload: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+        },
         expiresIn: '10day',
       });
 

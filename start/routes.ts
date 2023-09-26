@@ -43,6 +43,21 @@ Route.group(() => {
     Route.delete('/users/:id', 'UsersController.destroy').middleware('permission:can-delete-user')
 
     // Roles
+    Route.get('/roles', 'RolesController.index').middleware('permission:can-see-role')
+    Route.post('/roles', 'RolesController.store').middleware('permission:can-create-role')
+    Route.get('/roles/:id', 'RolesController.show').middleware('permission:can-see-role')
+    Route.patch('/roles/:id', 'RolesController.update').middleware('permission:can-edit-role')
+    Route.delete('/roles/:id', 'RolesController.destroy').middleware('permission:can-delete-role')
+    Route.post('/roles/:id/permissions', 'RolesController.assignPermissions').middleware('permission:can-create-role')
+    Route.delete('/roles/:id/permissions', 'RolesController.removePermissions').middleware('permission:can-delete-role')
+
+    // Permissions
+    Route.get('/permissions', 'PermissionsController.index').middleware('permission:can-see-permission')
+    Route.post('/permissions', 'PermissionsController.store').middleware('permission:can-create-permission')
+    Route.get('/permissions/:id', 'PermissionsController.show').middleware('permission:can-see-permission')
+    Route.patch('/permissions/:id', 'PermissionsController.update').middleware('permission:can-edit-permission')
+    Route.delete('/permissions/:id', 'PermissionsController.destroy').middleware('permission:can-delete-permission')
+
   }).middleware('auth:jwt')
 
 }).prefix('/api/v1')
