@@ -20,25 +20,30 @@ export default class AuthController {
 
     try {
 
-      const user = await User.findBy('username', usernameORemail) || await User.findBy('email', usernameORemail);
+      const user = await User.query()
+        .where('username', usernameORemail)
+        .orWhere('email', usernameORemail)
+        .firstOrFail();
 
-      if (!user) {
-        return response.badRequest('Invalid username/email or password');
-      }
+      const token = await auth.use('jwt').attempt(user.email, password);
 
-      const token = await auth.use('jwt').login(user, {
-        payload: {
-          id: user.id,
-          username: user.username,
-          email: user.email,
-        },
-        expiresIn: '10day',
+      response.cookie('authToken', token.accessToken, {
+        httpOnly: true,
+        sameSite: 'strict',
+        maxAge: 60 * 60 * 24 * 30,
+        // secure: true,
+      })
+
+      return JSON.stringify({
+
+        username: user.username,
+
       });
 
-      return token.toJSON();
-    } catch (error) {
-      console.log(error);
+    } catch {
+
       return response.internalServerError('Failed to login');
+
     }
 
   }
